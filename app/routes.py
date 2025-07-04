@@ -10,6 +10,7 @@ load_dotenv()
 CLIENT_ID = os.getenv('CLIENT_ID')
 SPOTIFY_SCOPES = os.getenv('SPOTIFY_SCOPES')
 REDIRECT_URI = os.getenv('REDIRECT_URI')
+ENCODED_CLIENT = os.getenv('ENCODED_CLIENT')
 
 @app.route('/')
 @app.route('/index')
@@ -35,12 +36,12 @@ def login_spotify():
 
 @app.route('/callback') # Rota para onde o Spotify vai redirecionar após a autorização
 def callback():
-    code = requests.args.get('code') # Obtém o código de autorização da URL
-    if code:
+    
+    try: 
+        code = requests.args.get('code') # Obtém o código de autorização da URL
         # Aqui você faria a requisição POST para o Spotify para trocar o 'code'
         # por um 'access_token' e 'refresh_token'.
-        # Isso envolveria usar o CLIENT_ID e o CLIENT_SECRET.
+        # Isso envolveria usar o ENCODED_CLIENT.
+    except:    
         return f"Autorização bem-sucedida! Código recebido: {code}. Agora troque-o por um token de acesso!"
-    else:
-        error = requests.args.get('error')
-        return f"Erro na autorização: {error or 'Usuário negou o acesso.'}"
+   
