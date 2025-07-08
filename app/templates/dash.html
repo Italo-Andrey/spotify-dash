@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Spotify</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="profile">
+        <div class="user-info">
+            {% if avatar_url %}
+                <img src="{{ avatar_url }}" alt="Avatar">
+            {% endif %}
+            <h1>Olá, {{ user_name }} 👋</h1>
+        </div>
+
+        <a href="{{ url_for('logout') }}">
+            <button class="logout-button">Sair</button>
+        </a>
+    </div>
+
+    <div class="chart-container">
+        <h2>Top 5 Artistas Recentes</h2>
+        {{ chart_html|safe }}
+    </div>
+
+</body>
+</html>
