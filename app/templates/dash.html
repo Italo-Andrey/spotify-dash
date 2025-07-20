@@ -23,7 +23,17 @@
 
     <div class="chart-container">
         <h2>Top 5 Artistas Recentes</h2>
-        {{ chart_html|safe }}
+        {{ chart_html_artists|safe }}
+    </div>
+
+    <div class="chart-container">
+        <h2>Distribuição por Hora do Dia</h2>
+        {{ chart_html_hourly|safe }}
+    </div>
+
+    <div class="chart-container">
+        <h2>Top 10 Músicas Recentes</h2>
+        {{ chart_html_tracks|safe }}
     </div>
 
 </body>
