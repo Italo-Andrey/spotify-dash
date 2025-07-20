@@ -10,7 +10,7 @@ Este é um projeto de portfólio que consome a API do Spotify via OAuth2 para vi
 ![Primeiro Acesso](assets/access.png)
 
 ### Dashboard
-![Dashboard](assets/dashboard.png)
+![Dashboard](assets/dashboad.png)
 
 ## 🔧 Tecnologias utilizadas
 
