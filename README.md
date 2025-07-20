@@ -1,6 +1,6 @@
 # 🎵 Spotify Dashboard
 
-Este é um projeto de portfólio que consome a API do Spotify via OAuth2 para visualizar informações da conta do usuário, como playlists, músicas mais ouvidas, entre outros dados.
+Este é um que consome a API do Spotify via OAuth2 para visualizar informações da conta do usuário, como playlists, músicas mais ouvidas, entre outros dados para visualização de Dashboards do perfil musical do usuário.
 
 ![Overview da Aplicação](assets/application_overview.png)
 
