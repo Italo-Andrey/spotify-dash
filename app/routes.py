@@ -18,7 +18,7 @@ load_dotenv()
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 SPOTIFY_SCOPES = 'user-read-private user-read-recently-played'
-REDIRECT_URI = os.getenv('REDIRECT_URI', 'http://127.0.0.1:5000/callback')
+REDIRECT_URI = os.getenv('REDIRECT_URI')
 
 
 @app.route('/')
