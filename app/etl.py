@@ -8,8 +8,8 @@ def process_recent_tracks(recent_data):
         track = item['track']
         played_at = item['played_at']
         data.append({
-            'music': track['name'],
-            'artist': track['artists'][0]['name'],
+            'Músicas': track['name'],
+            'Artistas': track['artists'][0]['name'],
             'played_at': played_at
         })
 
@@ -18,16 +18,15 @@ def process_recent_tracks(recent_data):
     return df
 
 def generate_top_artists(df):
-    top_artists = df['artist'].value_counts().head(5).reset_index()
-    top_artists.columns = ['artist', 'count']
+    top_artists = df['Artistas'].value_counts().head(5).reset_index()
+    top_artists.columns = ['Artistas', 'count']
     
     fig = px.bar(
         top_artists,
-        x='artist',
+        x='Artistas',
         y='count',
-        title='Top 5 Artistas Recentes',
         labels={'count': 'Quantidade de músicas'},
-        color='artist'
+        color='Artistas'
     )
 
     # Retorna o HTML do gráfico para embutir no template
@@ -41,20 +40,18 @@ def generate_hourly_distribution(df):
         x=hourly_counts.index,
         y=hourly_counts.values,
         labels={'x': 'Hora do dia', 'y': 'Quantidade de músicas'},
-        title='Distribuição de músicas por hora do dia'
     )
     return fig.to_html(full_html=False)
 
 def generate_top_tracks(df):
-    top_tracks = df['music'].value_counts().head(10).reset_index()
-    top_tracks.columns = ['music', 'count']
+    top_tracks = df['Músicas'].value_counts().head(10).reset_index()
+    top_tracks.columns = ['Músicas', 'count']
     
     fig = px.bar(
         top_tracks,
-        x='music',
+        x='Músicas',
         y='count',
-        title='Top 10 Músicas Recentes',
         labels={'count': 'Quantidade de vezes tocada'},
-        color='music'
+        color='Músicas'
     )
     return fig.to_html(full_html=False)

@@ -5,6 +5,7 @@
     <title>Dashboard Spotify</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="alternate icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 </head>
 <body>
 
@@ -22,17 +23,17 @@
     </div>
 
     <div class="chart-container">
-        <h2>Top 5 Artistas Recentes</h2>
+        <h2>Top Artistas que você anda escutando</h2>
         {{ chart_html_artists|safe }}
     </div>
 
     <div class="chart-container">
-        <h2>Distribuição por Hora do Dia</h2>
+        <h2>Horários que você ouve suas musicas</h2>
         {{ chart_html_hourly|safe }}
     </div>
 
     <div class="chart-container">
-        <h2>Top 10 Músicas Recentes</h2>
+        <h2>Suas 10 Músicas recentes</h2>
         {{ chart_html_tracks|safe }}
     </div>
 
