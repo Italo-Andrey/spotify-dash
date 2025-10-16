@@ -1,3 +1,4 @@
+APScheduler==3.11.0
 asttokens==3.0.0
 attrs==25.3.0
 blinker==1.9.0
@@ -44,7 +45,7 @@ PySocks==1.7.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 pytz==2025.2
-pywin32==310; platform_system == "Windows"
+pywin32==310
 pyzmq==27.0.0
 redis==6.2.0
 requests==2.32.3
@@ -61,6 +62,7 @@ trio==0.30.0
 trio-websocket==0.12.2
 typing_extensions==4.13.2
 tzdata==2025.2
+tzlocal==5.3.1
 urllib3==2.4.0
 wcwidth==0.2.13
 webdriver-manager==4.0.2

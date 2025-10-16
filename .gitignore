@@ -1,2 +1,32 @@
-.env 
-venv
+# Ambiente virtual
+venv/
+ENV/
+env/
+
+# Configurações e variáveis sensíveis
+.env
+*.env
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos de build e logs
+*.log
+*.sqlite3
+*.db
+
+# Cache de pacotes
+*.egg-info/
+dist/
+build/
+
+# Diretórios de IDEs
+.vscode/
+.idea/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
