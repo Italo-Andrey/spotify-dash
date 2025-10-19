@@ -1,4 +1,3 @@
-from app import app
 import requests
 
 def get_recent_tracks(access_token: str):
