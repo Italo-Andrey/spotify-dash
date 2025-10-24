@@ -8,10 +8,13 @@ from app.back.src.reuse.etl import (
     generate_hourly_distribution,
     generate_top_tracks
 )
-from app.back.src.models.models import create_or_update_user, get_user_by_spotify_id, add_tracks_for_user
+from app.back.src.models.models import create_or_update_user, get_user_by_spotify_id, add_tracks_for_user, get_tracks_dataframe_for_user
 from datetime import datetime, timedelta
 
+
+
 routes = Blueprint("routes", __name__)
+
 
 @routes.route('/')
 @routes.route('/index')
@@ -32,29 +35,29 @@ def callback():
         return "Erro: Código de autorização não recebido", 400
 
     try:
-        # 1️⃣ Troca o código pelos tokens
+        # Troca o código pelos tokens
         tokens = exchange_code_for_token(code)
         access_token = tokens["access_token"]
         refresh_token = tokens["refresh_token"]
         expires_in = tokens["expires_in"]
 
-        # 2️⃣ Busca dados do perfil do Spotify
+        # Busca dados do perfil do Spotify
         user_data = get_user_data(access_token)
 
-        # 3️⃣ Calcula data de expiração
+        # Calcula data de expiração
         expires_at = datetime.now() + timedelta(seconds=expires_in)
 
-        # 4️⃣ Enriquecer o dicionário user_data com informações do token
+        # Enriquecer o dicionário user_data com informações do token
         user_data.update({
             "access_token": access_token,
             "refresh_token": refresh_token,
             "token_expires_at": expires_at
         })
 
-        # 5️⃣ Cria ou atualiza o usuário
+        # Cria ou atualiza o usuário
         user = create_or_update_user(user_data=user_data, db_session=db.session)
 
-        # 6️⃣ Cria sessão local
+        # Cria sessão local
         session["spotify_user_id"] = user.spotify_id
         session["access_token"] = access_token
 
@@ -80,9 +83,8 @@ def dashboard():
     if not access_token:
         return redirect(url_for('routes.logout'))
 
-    # dados do perfil
+    # Dados do perfil
     user = get_user_by_spotify_id(spotify_user_id, db.session)
-
     if not user:
         return redirect(url_for('routes.logout'))
 
@@ -90,15 +92,32 @@ def dashboard():
     avatar_url = user.avatar_url
     access_token = user.access_token
 
-    # músicas recentes
+    # Atualiza as músicas recentes do usuário
     recent_data = get_recent_tracks(access_token)
-    df = process_recent_tracks(recent_data)
-    tracks_list = df.to_dict(orient='records')
-    add_tracks_for_user(user.id, tracks_list, db.session)
+    if recent_data:
+        df = process_recent_tracks(recent_data)
+        if not df.empty:
+            tracks_list = df.to_dict(orient="records")
+            # Aqui usamos a função normalmente com commit=True (default)
+            inserted_count = add_tracks_for_user(
+                user.id,
+                tracks_list,
+                db.session,
+                commit=True,
+                bulk=False
+            )
+            current_app.logger.info(f"{inserted_count} novas faixas inseridas para {user_name}.")
+        else:
+            current_app.logger.info(f"Nenhuma música nova retornada para {user_name}.")
+    else:
+        current_app.logger.warning(f"API do Spotify não retornou dados para {user_name}.")
 
-    chart_html_artists = generate_top_artists(df)
-    chart_html_hourly = generate_hourly_distribution(df)
-    chart_html_tracks = generate_top_tracks(df)
+    # Dataframe para gerar os gráficos
+    df_all = get_tracks_dataframe_for_user(user.id, db.session)
+
+    chart_html_artists = generate_top_artists(df_all)
+    chart_html_hourly = generate_hourly_distribution(df_all)
+    chart_html_tracks = generate_top_tracks(df_all)
 
     return render_template(
         "dash.html",

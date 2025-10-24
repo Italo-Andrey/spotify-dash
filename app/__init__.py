@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from apscheduler.schedulers.background import BackgroundScheduler
 
 # Carregar variáveis de ambiente
 load_dotenv()
@@ -11,10 +10,8 @@ load_dotenv()
 # Inicializar extensões (sem app ainda)
 db = SQLAlchemy()
 migrate = Migrate()
-scheduler = BackgroundScheduler()
 
 def create_app():
-
     template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "front/src/templates")
     static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "front/src/static")
 
@@ -28,10 +25,12 @@ def create_app():
     # Inicializa extensões
     db.init_app(app)
     migrate.init_app(app, db)
-    scheduler.start()
 
-    # Importa rotas dentro do contexto da função
+    # Importar blueprints
     from app.back.src.routes.routes import routes as routes_blueprint
     app.register_blueprint(routes_blueprint)
+
+    from app.back.src.schedulers.scheduler import start_scheduler
+    start_scheduler(app)
 
     return app

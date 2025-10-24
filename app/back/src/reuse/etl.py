@@ -14,8 +14,16 @@ def process_recent_tracks(recent_data):
         })
 
     df = pd.DataFrame(data)
+    
+    # Converte played_at para datetime
     df['played_at'] = pd.to_datetime(df['played_at'], format='mixed', utc=True)
+    
+    # Ordena pelo played_at
+    df = df.sort_values(by='played_at', ascending=True)
+    
     return df
+
+
 
 def generate_top_artists(df):
     top_artists = df['Artistas'].value_counts().head(5).reset_index()
@@ -32,6 +40,8 @@ def generate_top_artists(df):
     # Retorna o HTML do gráfico para embutir no template
     return fig.to_html(full_html=False)
 
+
+
 def generate_hourly_distribution(df):
     df['hour'] = df['played_at'].dt.hour
     hourly_counts = df['hour'].value_counts().sort_index()
@@ -42,6 +52,8 @@ def generate_hourly_distribution(df):
         labels={'x': 'Hora do dia', 'y': 'Quantidade de músicas'},
     )
     return fig.to_html(full_html=False)
+
+
 
 def generate_top_tracks(df):
     top_tracks = df['Músicas'].value_counts().head(10).reset_index()

@@ -1,8 +1,14 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from app.back.src.schedulers.scheduler_jobs import update_user_data
+from app.back.src.schedulers.scheduler_jobs import refresh_user_tokens, update_tracks_data
 
-def start_scheduler():
+def start_scheduler(app):
     scheduler = BackgroundScheduler()
-    scheduler.add_job(func=update_user_data, trigger='interval', minutes=15)
+
+    # 🔑 Atualiza tokens a cada 50 minutos
+    scheduler.add_job(refresh_user_tokens, args=[app], trigger='interval', minutes=50, id="refresh_tokens_job")
+
+    # 🎵 Atualiza músicas a cada 15 minutos
+    scheduler.add_job(update_tracks_data, args=[app], trigger='interval', minutes=60, id="update_tracks_job")
+
     scheduler.start()
     return scheduler

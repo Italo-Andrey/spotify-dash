@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from app import db
-
+from sqlalchemy import and_
+from pandas import DataFrame
 
 
 class User(db.Model):
@@ -73,17 +74,81 @@ def get_user_by_spotify_id(spotify_id, db_session):
 
 
 
-def add_tracks_for_user(user_id, tracks, db_session):
+def add_tracks_for_user(user_id, tracks, db_session, commit=True, bulk=True):
     """
-    tracks: lista de dicts com chaves 'track_name', 'artist_name', 'played_at'
+    Adiciona faixas para um usuário, comparando apenas as 50 últimas músicas do banco.
+    Garante consistência de timezone e evita duplicidades.
     """
-    track_objs = [
-        Track(
-            user_id=user_id,
-            track_name=t['Músicas'],
-            artist_name=t['Artistas'],
-            played_at=t['played_at']
-        ) for t in tracks
-    ]
-    db_session.bulk_save_objects(track_objs)
-    db_session.commit()
+
+    # 1️⃣ Busca as 50 últimas músicas já salvas no banco
+    existing = (
+        db_session.query(Track.played_at)
+        .filter(Track.user_id == user_id)
+        .order_by(Track.played_at.desc())
+        .limit(50)
+        .all()
+    )
+
+    # Converte para datetime "naive" (sem timezone)
+    existing_played = {row[0].replace(tzinfo=None) for row in existing}
+
+    # 2️⃣ Ordena as músicas recentes por played_at e pega as últimas 50
+    tracks = sorted(tracks, key=lambda x: x['played_at'], reverse=True)[:50]
+
+    new_tracks = []
+    for t in tracks:
+        # Converte para datetime nativo Python sem timezone
+        played_at = (
+            t['played_at'].to_pydatetime().replace(tzinfo=None)
+            if hasattr(t['played_at'], 'to_pydatetime')
+            else pd.to_datetime(t['played_at']).to_pydatetime().replace(tzinfo=None)
+        )
+
+        # Só insere se ainda não existir
+        if played_at not in existing_played:
+            new_tracks.append(
+                Track(
+                    user_id=user_id,
+                    track_name=t['Músicas'],
+                    artist_name=t['Artistas'],
+                    played_at=played_at,
+                )
+            )
+
+    # 3️⃣ Caso não haja novos registros, encerra
+    if not new_tracks:
+        return 0
+
+    # 4️⃣ Inserção (bulk ou não)
+    if bulk:
+        db_session.bulk_save_objects(new_tracks)
+    else:
+        db_session.add_all(new_tracks)
+
+    # 5️⃣ Commit opcional
+    if commit:
+        db_session.commit()
+
+    return len(new_tracks)
+
+
+
+
+
+
+
+
+def get_tracks_dataframe_for_user(user_id, db_session):
+    """Retorna um DataFrame com todas as faixas do usuário."""
+
+    tracks = db_session.query(Track).filter(Track.user_id == user_id).all()
+    if not tracks:
+        return DataFrame(columns=['Músicas', 'Artistas', 'played_at'])
+
+    data = [{
+        'Músicas': t.track_name,
+        'Artistas': t.artist_name,
+        'played_at': t.played_at
+    } for t in tracks]
+
+    return DataFrame(data)
