@@ -3,6 +3,7 @@ from datetime import datetime
 from app import db
 from sqlalchemy import and_
 from pandas import DataFrame
+import pandas as pd
 
 
 class User(db.Model):
